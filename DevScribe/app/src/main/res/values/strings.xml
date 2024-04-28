@@ -1,0 +1,7 @@
+<resources>
+  <string name="app_name">DevScribe</string>
+  <string name="label_filter_files">Show from files</string>
+  <string name="label_filter_room">Show from local</string>
+  <string name="cd_drop_down_icon">Drop down icon</string>
+  <string name="title_create_note">Create Note</string>
+</resources>
