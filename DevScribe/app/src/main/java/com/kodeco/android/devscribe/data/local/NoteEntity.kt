@@ -10,5 +10,6 @@ data class NoteEntity(
   val title: String,
   val description: String,
   val timestamp: Long,
-  val priority: String
+  val priority: String,
+  val noteLocation: String
 )

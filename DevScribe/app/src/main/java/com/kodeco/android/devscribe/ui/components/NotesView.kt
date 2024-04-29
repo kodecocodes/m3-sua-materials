@@ -12,14 +12,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.kodeco.android.devscribe.R
 import com.kodeco.android.devscribe.data.local.NoteEntity
 import com.kodeco.android.devscribe.ui.theme.DevScribeTheme
 import com.kodeco.android.devscribe.utils.formatTime
@@ -62,6 +68,7 @@ fun NoteListItem(note: NoteEntity) {
       ) {
         Text(
           text = note.title,
+          fontWeight = FontWeight.Bold
         )
         Box(
           modifier = Modifier
@@ -81,12 +88,29 @@ fun NoteListItem(note: NoteEntity) {
           )
         }
       }
-      Text(
+      Row(
         modifier = Modifier
           .fillMaxWidth()
-          .padding(top = 6.dp),
-        text = formatTime(note.timestamp),
-      )
+          .padding(top = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Text(
+          text = formatTime(note.timestamp),
+          fontSize = 12.sp,
+          color = Color.Gray
+        )
+        val icon = when(note.noteLocation) {
+          "Internal Storage" -> R.drawable.baseline_smartphone_24
+          "External Storage" -> R.drawable.baseline_sd_storage_24
+          else -> R.drawable.baseline_storage_24
+        }
+        Icon(
+          painter = painterResource(id = icon),
+          contentDescription = "Storage location icon",
+          tint = MaterialTheme.colorScheme.primary
+        )
+      }
     }
   }
 }

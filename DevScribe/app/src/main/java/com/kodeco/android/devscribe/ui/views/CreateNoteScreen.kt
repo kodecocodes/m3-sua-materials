@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kodeco.android.devscribe.R
+import com.kodeco.android.devscribe.ui.components.NoteLocationView
 import com.kodeco.android.devscribe.ui.components.SpinnerView
 import com.kodeco.android.devscribe.ui.state.CreateNoteEvents
 import com.kodeco.android.devscribe.ui.state.CreateNoteState
@@ -84,6 +85,9 @@ fun CreateNoteScreen(
           onCreateNote = {
             viewModel.handleCreateNoteEvents(CreateNoteEvents.CreateNote)
             navigateBack()
+          },
+          onNoteLocationChange = { noteLocation ->
+            viewModel.handleCreateNoteEvents(CreateNoteEvents.NoteLocationChanged(noteLocation))
           }
         )
       }
@@ -97,7 +101,8 @@ fun CreateNoteScreenContent(
   onTitleChange: (String) -> Unit,
   onDescriptionChange: (String) -> Unit,
   onPriorityChange: (String) -> Unit,
-  onCreateNote: () -> Unit
+  onCreateNote: () -> Unit,
+  onNoteLocationChange: (String) -> Unit
 ) {
   Column(
     modifier = Modifier
@@ -121,6 +126,10 @@ fun CreateNoteScreenContent(
     )
     SpinnerView(
       onPrioritySelected = onPriorityChange
+    )
+
+    NoteLocationView(
+      onNoteLocationChange = onNoteLocationChange
     )
 
     Button(

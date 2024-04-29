@@ -2,6 +2,8 @@ package com.kodeco.android.devscribe.di
 
 import androidx.room.Room
 import com.kodeco.android.devscribe.data.datastore.DataStoreManager
+import com.kodeco.android.devscribe.data.files.ExternalNotesFileManager
+import com.kodeco.android.devscribe.data.files.InternalNotesFileManager
 import com.kodeco.android.devscribe.data.local.DevScribeDatabase
 import com.kodeco.android.devscribe.repository.NotesRepository
 import com.kodeco.android.devscribe.repository.NotesRepositoryImpl
@@ -16,7 +18,7 @@ val dataStoreModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { MainViewModel(get(), get()) }
+    viewModel { MainViewModel(get(), get(), get(), get()) }
 }
 
 
@@ -33,8 +35,12 @@ val roomDatabaseModule = module {
         Room.databaseBuilder(androidContext(), DevScribeDatabase::class.java, "dev_scribe_db")
             .build()
     }
-
     single { get<DevScribeDatabase>().notesDao() }
+}
+
+val notesFileManagerModule = module {
+    single { InternalNotesFileManager(androidContext()) }
+    single { ExternalNotesFileManager(androidContext()) }
 }
 
 
@@ -43,5 +49,6 @@ val appModules = listOf(
     viewModelModule,
     dispatcherModule,
     repositoryModule,
-    roomDatabaseModule
+    roomDatabaseModule,
+    notesFileManagerModule
 )

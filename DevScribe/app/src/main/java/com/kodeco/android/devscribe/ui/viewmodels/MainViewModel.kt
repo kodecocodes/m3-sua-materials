@@ -3,6 +3,8 @@ package com.kodeco.android.devscribe.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kodeco.android.devscribe.data.datastore.DataStoreManager
+import com.kodeco.android.devscribe.data.files.ExternalNotesFileManager
+import com.kodeco.android.devscribe.data.files.InternalNotesFileManager
 import com.kodeco.android.devscribe.data.local.NoteEntity
 import com.kodeco.android.devscribe.repository.NotesRepository
 import com.kodeco.android.devscribe.ui.state.CreateNoteEvents
@@ -14,7 +16,9 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(
   private val dataStoreManager: DataStoreManager,
-  private val notesRepository: NotesRepository
+  private val notesRepository: NotesRepository,
+  private val externalNotesFileManager: ExternalNotesFileManager,
+  private val internalNotesFileManager: InternalNotesFileManager
 ): ViewModel() {
   private val _selectedFilter = MutableStateFlow("All")
   val selectedFilter = _selectedFilter.asStateFlow()
@@ -76,12 +80,29 @@ class MainViewModel(
           viewModelScope.launch {
             val noteEntity = NoteEntity(
               title = createNoteState.value.title ?: "",
-              description = _createNoteState.value.description ?: "",
-              priority = _createNoteState.value.priority ?: "",
-              timestamp = System.currentTimeMillis()
+              description = createNoteState.value.description ?: "",
+              priority = createNoteState.value.priority ?: "",
+              timestamp = System.currentTimeMillis(),
+              noteLocation = createNoteState.value.noteLocation ?: ""
             )
-            notesRepository.saveNote(noteEntity)
+            when(noteEntity.noteLocation) {
+              "Internal Storage" -> {
+                internalNotesFileManager.writeTextFile(noteEntity)
+              }
+              "External Storage" -> {
+                externalNotesFileManager.writeTextFile(noteEntity)
+              }
+              "Room Database" -> {
+                notesRepository.saveNote(noteEntity)
+              }
+            }
           }
+        }
+      }
+
+      is CreateNoteEvents.NoteLocationChanged -> {
+        _createNoteState.update {
+          it.copy(noteLocation = event.noteLocation)
         }
       }
     }
@@ -91,7 +112,7 @@ class MainViewModel(
     viewModelScope.launch {
       notesRepository.getNotes().collect { notes ->
         _notes.update {
-          notes
+          notes + externalNotesFileManager.readTextFile() + internalNotesFileManager.readTextFile()
         }
       }
     }
