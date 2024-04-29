@@ -1,5 +1,7 @@
 package com.kodeco.android.devscribe.ui.views
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,15 +18,17 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kodeco.android.devscribe.R
 import com.kodeco.android.devscribe.data.local.NoteEntity
 import com.kodeco.android.devscribe.di.appModules
+import com.kodeco.android.devscribe.ui.components.MainScreenActionBarActions
 import com.kodeco.android.devscribe.ui.components.NotesView
 import com.kodeco.android.devscribe.ui.theme.DevScribeTheme
 import com.kodeco.android.devscribe.ui.viewmodels.MainViewModel
@@ -35,7 +39,7 @@ import org.koin.compose.koinInject
 @Composable
 fun MainScreen(navigateToCreateNote: () -> Unit){
   val viewModel:MainViewModel = koinInject()
-  val noteSource by viewModel.noteSource.collectAsStateWithLifecycle()
+  val selectedFilter by viewModel.selectedFilter.collectAsStateWithLifecycle()
   val notes by viewModel.notes.collectAsStateWithLifecycle()
   Scaffold(
     topBar = {
@@ -48,23 +52,19 @@ fun MainScreen(navigateToCreateNote: () -> Unit){
          titleContentColor = MaterialTheme.colorScheme.onPrimary
        ),
        actions = {
-         Icon(
-           painter = painterResource(id = R.drawable.baseline_filter_list_24),
-           contentDescription = "Filter",
-           tint = Color.White
-         )
+          MainScreenActionBarActions(
+            filter = selectedFilter,
+            onFilterChange = {
+              viewModel.saveSelectedFilter(it)
+            }
+          )
        }
      )
     },
     content = {
       MainScreenContent(
-        noteSource = noteSource,
         paddingValues = it,
-        onNoteSourceChanged = { noteSource ->
-          viewModel.saveNoteSource(noteSource)
-        },
         notes = notes
-
       )
     },
     floatingActionButton = {
@@ -79,28 +79,35 @@ fun MainScreen(navigateToCreateNote: () -> Unit){
   )
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreenContent(
   paddingValues: PaddingValues,
-  onNoteSourceChanged: (Int) -> Unit,
-  noteSource: Int,
   notes: List<NoteEntity>
 ) {
   Column(
       modifier = Modifier
         .fillMaxSize()
         .padding(paddingValues)
+        .background(Color.LightGray.copy(alpha = 0.2f)),
   ) {
-
-    val options = listOf(
-      stringResource(id = R.string.label_filter_files),
-      stringResource(id = R.string.label_filter_room)
-    )
-    NotesView(
-      notes = notes
-    )
+    if (notes.isEmpty()) {
+      Column(
+        modifier = Modifier
+          .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+      ) {
+        Text(
+          text = "No notes available",
+          modifier = Modifier
+            .padding(16.dp)
+        )
+      }
+    } else {
+      NotesView(
+        notes = notes
+      )
+    }
   }
 }
 

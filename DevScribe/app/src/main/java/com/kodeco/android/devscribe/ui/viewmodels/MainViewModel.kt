@@ -16,30 +16,39 @@ class MainViewModel(
   private val dataStoreManager: DataStoreManager,
   private val notesRepository: NotesRepository
 ): ViewModel() {
-  private val _noteSource = MutableStateFlow(0)
-  val noteSource = _noteSource.asStateFlow()
+  private val _selectedFilter = MutableStateFlow("All")
+  val selectedFilter = _selectedFilter.asStateFlow()
 
   private val _notes = MutableStateFlow<List<NoteEntity>>(emptyList())
   val notes = _notes.asStateFlow()
 
   init {
     fetchNotes()
-    fetchNoteSource()
+    fetchSelectedFilter()
   }
 
 
   private val _createNoteState = MutableStateFlow(CreateNoteState())
   val createNoteState = _createNoteState.asStateFlow()
 
-     fun saveNoteSource(source: Int) {
+     fun saveSelectedFilter(selectedFilter: String) {
        viewModelScope.launch {
-           dataStoreManager.saveNoteSource(source)
+           dataStoreManager.saveSelectedFilter(selectedFilter)
+         if (selectedFilter != "All") {
+          _notes.update {
+            notes.value.filter { note ->
+              note.priority == selectedFilter
+            }
+          }
+         } else {
+           fetchNotes()
+         }
        }
     }
 
-    private fun fetchNoteSource() {
-        dataStoreManager.getNoteSource().let {
-            _noteSource.update {
+    private fun fetchSelectedFilter() {
+        dataStoreManager.getSelectedFilter().let {
+            _selectedFilter.update {
                 it
             }
         }
