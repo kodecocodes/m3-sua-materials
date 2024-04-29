@@ -37,7 +37,10 @@ import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navigateToCreateNote: () -> Unit){
+fun MainScreen(
+  navigateToCreateNote: () -> Unit,
+  navigateToNoteDetails: (NoteEntity) -> Unit
+){
   val viewModel:MainViewModel = koinInject()
   val selectedFilter by viewModel.selectedFilter.collectAsStateWithLifecycle()
   val notes by viewModel.notes.collectAsStateWithLifecycle()
@@ -64,7 +67,8 @@ fun MainScreen(navigateToCreateNote: () -> Unit){
     content = {
       MainScreenContent(
         paddingValues = it,
-        notes = notes
+        notes = notes,
+        navigateToNoteDetails = navigateToNoteDetails
       )
     },
     floatingActionButton = {
@@ -82,7 +86,8 @@ fun MainScreen(navigateToCreateNote: () -> Unit){
 @Composable
 fun MainScreenContent(
   paddingValues: PaddingValues,
-  notes: List<NoteEntity>
+  notes: List<NoteEntity>,
+  navigateToNoteDetails: (NoteEntity) -> Unit
 ) {
   Column(
       modifier = Modifier
@@ -105,7 +110,8 @@ fun MainScreenContent(
       }
     } else {
       NotesView(
-        notes = notes
+        notes = notes,
+        onNoteClick = navigateToNoteDetails
       )
     }
   }
@@ -123,7 +129,8 @@ fun MainScreenPreview() {
     }
     ) {
       MainScreen(
-        navigateToCreateNote = {}
+        navigateToCreateNote = {},
+        navigateToNoteDetails = {}
       )
     }
   }

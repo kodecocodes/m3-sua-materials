@@ -6,6 +6,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.kodeco.android.devscribe.ui.views.CreateNoteScreen
 import com.kodeco.android.devscribe.ui.views.MainScreen
+import com.kodeco.android.devscribe.ui.views.NoteDetailsScreen
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.Json.Default.decodeFromString
 
 @Composable
 fun DevScribeNavHost(
@@ -16,6 +20,9 @@ fun DevScribeNavHost(
       MainScreen(
         navigateToCreateNote = {
         navController.navigate(Screens.CreateNote.route)
+      },
+        navigateToNoteDetails = { note ->
+        navController.navigate("${Screens.NoteDetails.route}/${Json.encodeToString(note)}")
       }
       )
     }
@@ -24,6 +31,15 @@ fun DevScribeNavHost(
         navigateBack = {
         navController.popBackStack()
       }
+      )
+    }
+
+    composable(Screens.NoteDetails.route+"/{note}") { backStackEntry ->
+      NoteDetailsScreen(
+        navigateBack = {
+        navController.popBackStack()
+      },
+        note = backStackEntry.arguments?.getString("note")?.let { decodeFromString(it) }
       )
     }
   }

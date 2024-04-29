@@ -16,6 +16,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +38,13 @@ fun SpinnerView(
   var selectedIndex by remember { mutableIntStateOf(0) }
   val priorities = listOf("High", "Medium", "Low")
   var selectedValueLabel by remember { mutableStateOf(priorities[selectedIndex]) }
+
+  LaunchedEffect(Unit) {
+    selectedIndex = 0
+    expanded = false
+    selectedValueLabel = priorities[selectedIndex]
+    onPrioritySelected(selectedValueLabel)
+  }
 
   Column {
     Text(

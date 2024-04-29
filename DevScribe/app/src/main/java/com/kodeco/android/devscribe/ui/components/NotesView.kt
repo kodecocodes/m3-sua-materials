@@ -1,6 +1,7 @@
 package com.kodeco.android.devscribe.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,7 +32,10 @@ import com.kodeco.android.devscribe.ui.theme.DevScribeTheme
 import com.kodeco.android.devscribe.utils.formatTime
 
 @Composable
-fun NotesView(notes: List<NoteEntity>) {
+fun NotesView(
+  notes: List<NoteEntity>,
+  onNoteClick: (NoteEntity) -> Unit
+) {
   LazyColumn(
       modifier = Modifier
         .fillMaxWidth()
@@ -39,18 +43,26 @@ fun NotesView(notes: List<NoteEntity>) {
   ) {
     items(notes) { note ->
       NoteListItem(
-          note = note
+          note = note,
+          onNoteClick = onNoteClick
       )
     }
   }
 }
 
 @Composable
-fun NoteListItem(note: NoteEntity) {
+fun NoteListItem(
+  note: NoteEntity,
+  onNoteClick: (NoteEntity) -> Unit
+) {
   Card(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(top = 8.dp),
+      .padding(top = 8.dp)
+      .clickable {
+        onNoteClick(note)
+
+      },
     colors = CardDefaults.cardColors(containerColor = Color.White),
     shape = RoundedCornerShape(10.dp)
   ) {
@@ -121,6 +133,9 @@ fun NoteListItem(note: NoteEntity) {
 @Composable
 fun NotesViewPreview() {
  DevScribeTheme {
-    NotesView(notes = emptyList())
+    NotesView(
+      notes = emptyList(),
+      onNoteClick = { }
+    )
  }
 }

@@ -46,7 +46,9 @@ fun CreateNoteScreen(
     topBar = {
       TopAppBar(
         title = {
-          Text(stringResource(id = R.string.app_name))
+          Text(
+            text = stringResource(id = R.string.title_create_note)
+          )
         },
         colors = TopAppBarDefaults.topAppBarColors(
           containerColor = MaterialTheme.colorScheme.primary,
