@@ -11,11 +11,11 @@ data class CreateNoteState(
    }
 }
 
-sealed class CreateNoteEvents {
-  data class TitleChanged(val title: String) : CreateNoteEvents()
-  data class DescriptionChanged(val description: String) : CreateNoteEvents()
-  data class PriorityChanged(val priority: String) : CreateNoteEvents()
+sealed interface CreateNoteEvents {
+  data class TitleChanged(val title: String) : CreateNoteEvents
+  data class DescriptionChanged(val description: String) : CreateNoteEvents
+  data class PriorityChanged(val priority: String) : CreateNoteEvents
 
-  data class NoteLocationChanged(val noteLocation: String) : CreateNoteEvents()
-  data object CreateNote : CreateNoteEvents()
+  data class NoteLocationChanged(val noteLocation: String) : CreateNoteEvents
+  data object CreateNote : CreateNoteEvents
 }
