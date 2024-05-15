@@ -1,5 +1,6 @@
 package com.kodeco.android.devscribe.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu

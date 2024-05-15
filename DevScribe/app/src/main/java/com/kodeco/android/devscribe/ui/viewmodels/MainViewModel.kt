@@ -20,7 +20,7 @@ class MainViewModel(
   private val externalNotesFileManager: ExternalNotesFileManager,
   private val internalNotesFileManager: InternalNotesFileManager
 ): ViewModel() {
-  private val _selectedFilter = MutableStateFlow("All")
+  private val _selectedFilter = MutableStateFlow("")
   val selectedFilter = _selectedFilter.asStateFlow()
 
   private val _notes = MutableStateFlow<List<NoteEntity>>(emptyList())
@@ -50,13 +50,13 @@ class MainViewModel(
        }
     }
 
-    private fun fetchSelectedFilter() {
-        dataStoreManager.getSelectedFilter().let {
-            _selectedFilter.update {
-                it
-            }
-        }
+  private fun fetchSelectedFilter() {
+    viewModelScope.launch {
+      dataStoreManager.getSelectedFilter().collect { selectedFilter ->
+        _selectedFilter.update { selectedFilter }
+      }
     }
+  }
 
   fun handleCreateNoteEvents(event: CreateNoteEvents) {
     when(event) {
