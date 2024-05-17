@@ -1,6 +1,5 @@
 package com.kodeco.android.devscribe.ui.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kodeco.android.devscribe.data.datastore.DataStoreManager
