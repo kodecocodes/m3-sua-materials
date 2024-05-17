@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class MainViewModel(
 ): ViewModel() {
-  private val _selectedFilter = MutableStateFlow("All")
+  private val _selectedFilter = MutableStateFlow("")
   val selectedFilter = _selectedFilter.asStateFlow()
 
   private val _notes = MutableStateFlow<List<NoteEntity>>(emptyList())
