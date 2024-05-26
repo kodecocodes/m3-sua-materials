@@ -79,9 +79,9 @@ class MainViewModel(
               "Internal Storage" -> {
                 internalNotesFileManager.writeTextFile(noteEntity)
               }
-              "External Storage" -> {
-                externalNotesFileManager.writeTextFile(noteEntity)
-              }
+//              "External Storage" -> {
+//                externalNotesFileManager.writeTextFile(noteEntity)
+//              }
               else -> {
                 // TODO: Implement other note locations
               }
@@ -101,7 +101,7 @@ class MainViewModel(
   private fun fetchNotes() {
     viewModelScope.launch {
       _notes.update {
-         internalNotesFileManager.readTextFile() + externalNotesFileManager.readTextFile()
+         internalNotesFileManager.readTextFile()
       }
     }
   }
