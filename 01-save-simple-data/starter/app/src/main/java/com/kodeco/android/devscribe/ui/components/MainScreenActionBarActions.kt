@@ -24,6 +24,7 @@ fun MainScreenActionBarActions(
 ) {
   var showFilterManu by remember { mutableStateOf(false) }
   var selectedFilter by remember { mutableStateOf(filter) }
+  val previousFilter = listOf(filter)
   val filterOptions = listOf("All", "High", "Medium", "Low")
 
   IconButton(
@@ -49,7 +50,7 @@ fun MainScreenActionBarActions(
                  verticalAlignment = Alignment.CenterVertically
                ){
                  Checkbox(
-                   checked = selectedFilter == filterOptions[position],
+                   checked = (selectedFilter == filterOptions[position]) || previousFilter.contains(filterOptions[position]),
                    onCheckedChange ={
                      selectedFilter = filterOptions[position]
                      onFilterChange(selectedFilter)
