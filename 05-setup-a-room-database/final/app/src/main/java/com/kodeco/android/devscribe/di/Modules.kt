@@ -28,6 +28,7 @@ val roomDatabaseModule = module {
         Room.databaseBuilder(androidContext(), DevScribeDatabase::class.java, "dev_scribe_db")
             .build()
     }
+    single { get<DevScribeDatabase>().notesDao() }
 }
 
 
