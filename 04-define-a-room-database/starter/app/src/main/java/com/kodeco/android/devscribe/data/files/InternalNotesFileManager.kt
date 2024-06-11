@@ -2,6 +2,8 @@ package com.kodeco.android.devscribe.data.files
 
 import android.content.Context
 import com.kodeco.android.devscribe.data.local.NoteEntity
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -18,7 +20,7 @@ class InternalNotesFileManager(
     val file = File(directory, "${note.title}.txt")
     try {
       file.outputStream().use { outputStream ->
-        outputStream.write(note.description.toByteArray())
+        outputStream.write(Json.encodeToString(note).toByteArray())
       }
     } catch (e: IOException) {
       e.printStackTrace()
@@ -34,13 +36,7 @@ class InternalNotesFileManager(
         val inputStream = FileInputStream(file)
         val content = inputStream.bufferedReader().use { it.readText() }
         notes.add(
-          NoteEntity(
-            title = file.name,
-            description = content,
-            timestamp = file.lastModified(),
-            priority = "Low",
-            noteLocation = "Internal Storage"
-          )
+          Json.decodeFromString(content)
         )
       } catch (e: IOException) {
         e.printStackTrace()
