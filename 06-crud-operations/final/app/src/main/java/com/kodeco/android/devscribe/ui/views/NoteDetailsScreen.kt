@@ -97,7 +97,8 @@ fun NoteDetailsScreen(
             IconButton(
               onClick = {
                 note?.let {
-                  // TODO: Implement delete functionality
+                  viewModel.delete(it)
+                  navigateBack()
                 }
               },
               content = {
@@ -149,8 +150,8 @@ fun NoteDetailsScreenContent(note: NoteEntity) {
 
         Box(
           modifier = Modifier
-            .clip(shape = RoundedCornerShape(24.dp))
             .padding(top = 6.dp)
+            .clip(shape = RoundedCornerShape(24.dp))
             .background(
               when (note.priority) {
                 "High" -> Color.Red

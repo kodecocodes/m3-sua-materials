@@ -30,6 +30,7 @@ import com.kodeco.android.devscribe.R
 import com.kodeco.android.devscribe.data.local.NoteEntity
 import com.kodeco.android.devscribe.ui.components.SpinnerView
 import com.kodeco.android.devscribe.ui.components.UpdateNoteLocationView
+import com.kodeco.android.devscribe.ui.state.CreateNoteEvents
 import com.kodeco.android.devscribe.ui.state.CreateNoteState
 import com.kodeco.android.devscribe.ui.viewmodels.MainViewModel
 import org.koin.compose.koinInject
@@ -43,7 +44,7 @@ fun EditNoteScreen(
     val viewModel: MainViewModel = koinInject()
     LaunchedEffect(Unit) {
         note?.let {
-            // Todo update state with previous note details
+            viewModel.updateNoteWithPreviousDetails(it)
         }
     }
     val createNoteState by viewModel.createNoteState.collectAsStateWithLifecycle()
@@ -78,7 +79,25 @@ fun EditNoteScreen(
                 modifier = Modifier
                     .padding(it)
             ) {
-                // Todo add update note screen content
+                UpdateNoteScreenContent(
+                    createNoteState = createNoteState,
+                    onTitleChange = { title ->
+                        viewModel.handleCreateNoteEvents(CreateNoteEvents.TitleChanged(title))
+                    },
+                    onDescriptionChange = { description ->
+                        viewModel.handleCreateNoteEvents(CreateNoteEvents.DescriptionChanged(description))
+                    },
+                    onPriorityChange = { priority ->
+                        viewModel.handleCreateNoteEvents(CreateNoteEvents.PriorityChanged(priority))
+                    },
+                    onUpdateNote = {
+                        viewModel.handleCreateNoteEvents(CreateNoteEvents.UpdateNote)
+                        navigateToHome()
+                    },
+                    onNoteLocationChange = { noteLocation ->
+                        viewModel.handleCreateNoteEvents(CreateNoteEvents.NoteLocationChanged(noteLocation))
+                    }
+                )
             }
         }
     )

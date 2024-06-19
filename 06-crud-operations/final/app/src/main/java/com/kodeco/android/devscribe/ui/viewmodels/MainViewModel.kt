@@ -27,6 +27,9 @@ class MainViewModel(
   private val _notes = MutableStateFlow<List<NoteEntity>>(emptyList())
   val notes = _notes.asStateFlow()
 
+  private val _currentNote = MutableStateFlow<NoteEntity?>(null)
+  val currentNote = _currentNote.asStateFlow()
+
   init {
     fetchSelectedFilter()
     fetchNotes()
@@ -97,6 +100,21 @@ class MainViewModel(
           it.copy(noteLocation = event.noteLocation)
         }
       }
+      CreateNoteEvents.UpdateNote -> {
+        if (createNoteState.value.isValid()) {
+          viewModelScope.launch {
+            val noteEntity = NoteEntity(
+              id = currentNote.value?.id ?: 0,
+              title = createNoteState.value.title ?: "",
+              description = createNoteState.value.description ?: "",
+              priority = createNoteState.value.priority ?: "",
+              timestamp = System.currentTimeMillis(),
+              noteLocation = createNoteState.value.noteLocation ?: ""
+            )
+            notesRepository.update(noteEntity)
+          }
+        }
+      }
     }
   }
 
@@ -107,6 +125,26 @@ class MainViewModel(
           notes + externalNotesFileManager.readTextFile() + internalNotesFileManager.readTextFile()
         }
       }
+    }
+  }
+
+  fun updateNoteWithPreviousDetails(noteEntity: NoteEntity) {
+    _currentNote.update {
+      noteEntity
+    }
+    _createNoteState.update {
+      it.copy(
+        title = noteEntity.title,
+        description = noteEntity.description,
+        priority = noteEntity.priority,
+        noteLocation = noteEntity.noteLocation
+      )
+    }
+  }
+
+  fun delete(noteEntity: NoteEntity) {
+    viewModelScope.launch {
+      notesRepository.delete(noteEntity)
     }
   }
 }
