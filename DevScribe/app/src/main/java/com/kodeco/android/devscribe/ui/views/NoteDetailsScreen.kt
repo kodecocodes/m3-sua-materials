@@ -1,5 +1,6 @@
 package com.kodeco.android.devscribe.ui.views
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -31,14 +34,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kodeco.android.devscribe.R
 import com.kodeco.android.devscribe.data.local.NoteEntity
+import com.kodeco.android.devscribe.ui.viewmodels.MainViewModel
 import com.kodeco.android.devscribe.utils.formatTime
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteDetailsScreen(
   navigateBack: () -> Unit,
-  note: NoteEntity?
+  note: NoteEntity?,
+  editNote: (NoteEntity) -> Unit
 ) {
+  val viewModel: MainViewModel = koinInject()
   Scaffold(
     topBar = {
       TopAppBar(
@@ -62,6 +69,47 @@ fun NoteDetailsScreen(
               )
             }
           )
+        },
+        actions = {
+          val showActions = note != null && note.noteLocation == "Room Database"
+          AnimatedVisibility(
+            visible = showActions
+          ) {
+            IconButton(
+              onClick = {
+                note?.let {
+                  editNote(it)
+                }
+              },
+              content = {
+                Icon(
+                  imageVector = Icons.Default.Edit,
+                  contentDescription = "Edit",
+                  tint = Color.White
+                )
+              }
+            )
+          }
+
+          AnimatedVisibility(
+            visible = showActions
+          ) {
+            IconButton(
+              onClick = {
+                note?.let {
+                  viewModel.delete(it)
+                  navigateBack()
+                }
+              },
+              content = {
+                Icon(
+                  imageVector = Icons.Default.Delete,
+                  contentDescription = "Delete",
+                  tint = Color.White
+                )
+              }
+            )
+          }
         }
       )
     },

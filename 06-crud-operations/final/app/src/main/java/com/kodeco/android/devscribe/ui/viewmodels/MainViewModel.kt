@@ -7,6 +7,7 @@ import com.kodeco.android.devscribe.data.datastore.DataStoreManager
 import com.kodeco.android.devscribe.data.files.ExternalNotesFileManager
 import com.kodeco.android.devscribe.data.files.InternalNotesFileManager
 import com.kodeco.android.devscribe.data.local.NoteEntity
+import com.kodeco.android.devscribe.repository.NotesRepository
 import com.kodeco.android.devscribe.ui.state.CreateNoteEvents
 import com.kodeco.android.devscribe.ui.state.CreateNoteState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,8 @@ import kotlinx.coroutines.launch
 class MainViewModel(
   private val dataStoreManager: DataStoreManager,
   private val internalNotesFileManager: InternalNotesFileManager,
-  private val externalNotesFileManager: ExternalNotesFileManager
+  private val externalNotesFileManager: ExternalNotesFileManager,
+  private val notesRepository: NotesRepository
 ): ViewModel() {
   private val _selectedFilter = MutableStateFlow("")
   val selectedFilter = _selectedFilter.asStateFlow()
@@ -82,8 +84,8 @@ class MainViewModel(
               "External Storage" -> {
                 externalNotesFileManager.writeTextFile(noteEntity)
               }
-              else -> {
-                // TODO: Implement other note locations
+              "Room Database" -> {
+                notesRepository.saveNote(noteEntity)
               }
             }
           }
@@ -100,8 +102,10 @@ class MainViewModel(
 
   private fun fetchNotes() {
     viewModelScope.launch {
-      _notes.update {
-         internalNotesFileManager.readTextFile() + externalNotesFileManager.readTextFile()
+      notesRepository.getNotes().collect { notes ->
+        _notes.update {
+          notes + externalNotesFileManager.readTextFile() + internalNotesFileManager.readTextFile()
+        }
       }
     }
   }

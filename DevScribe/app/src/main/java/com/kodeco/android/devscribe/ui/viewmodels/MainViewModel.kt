@@ -26,6 +26,9 @@ class MainViewModel(
   private val _notes = MutableStateFlow<List<NoteEntity>>(emptyList())
   val notes = _notes.asStateFlow()
 
+  private val _currentNote = MutableStateFlow<NoteEntity?>(null)
+  val currentNote = _currentNote.asStateFlow()
+
   init {
     fetchNotes()
     fetchSelectedFilter()
@@ -59,24 +62,27 @@ class MainViewModel(
   }
 
   fun handleCreateNoteEvents(event: CreateNoteEvents) {
-    when(event) {
+    when (event) {
       is CreateNoteEvents.TitleChanged -> {
         _createNoteState.update {
           it.copy(title = event.title)
         }
       }
+
       is CreateNoteEvents.DescriptionChanged -> {
         _createNoteState.update {
           it.copy(description = event.description)
         }
       }
+
       is CreateNoteEvents.PriorityChanged -> {
         _createNoteState.update {
           it.copy(priority = event.priority)
         }
       }
+
       is CreateNoteEvents.CreateNote -> {
-        if(createNoteState.value.isValid()) {
+        if (createNoteState.value.isValid()) {
           viewModelScope.launch {
             val noteEntity = NoteEntity(
               title = createNoteState.value.title ?: "",
@@ -85,13 +91,15 @@ class MainViewModel(
               timestamp = System.currentTimeMillis(),
               noteLocation = createNoteState.value.noteLocation ?: ""
             )
-            when(noteEntity.noteLocation) {
+            when (noteEntity.noteLocation) {
               "Internal Storage" -> {
                 internalNotesFileManager.writeTextFile(noteEntity)
               }
+
               "External Storage" -> {
                 externalNotesFileManager.writeTextFile(noteEntity)
               }
+
               "Room Database" -> {
                 notesRepository.saveNote(noteEntity)
               }
@@ -105,6 +113,22 @@ class MainViewModel(
           it.copy(noteLocation = event.noteLocation)
         }
       }
+
+      CreateNoteEvents.UpdateNote -> {
+        if (createNoteState.value.isValid()) {
+          viewModelScope.launch {
+            val noteEntity = NoteEntity(
+              id = currentNote.value?.id ?: 0,
+              title = createNoteState.value.title ?: "",
+              description = createNoteState.value.description ?: "",
+              priority = createNoteState.value.priority ?: "",
+              timestamp = System.currentTimeMillis(),
+              noteLocation = createNoteState.value.noteLocation ?: ""
+            )
+            notesRepository.update(noteEntity)
+          }
+        }
+      }
     }
   }
 
@@ -116,5 +140,25 @@ class MainViewModel(
         }
       }
     }
+  }
+
+  fun updateNoteWithPreviousDetails(noteEntity: NoteEntity) {
+    _currentNote.update {
+      noteEntity
+    }
+    _createNoteState.update {
+      it.copy(
+        title = noteEntity.title,
+        description = noteEntity.description,
+        priority = noteEntity.priority,
+        noteLocation = noteEntity.noteLocation
+      )
+    }
+  }
+
+  fun delete(noteEntity: NoteEntity) {
+   viewModelScope.launch {
+     notesRepository.delete(noteEntity)
+   }
   }
 }
