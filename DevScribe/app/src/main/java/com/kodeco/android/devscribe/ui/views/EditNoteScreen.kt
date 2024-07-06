@@ -133,7 +133,9 @@ fun UpdateNoteScreenContent(
       label = { Text("Description") }
     )
     SpinnerView(
-      onPrioritySelected = onPriorityChange
+      onPrioritySelected = onPriorityChange,
+      previousSelectedItem = createNoteState.priority ?: "",
+      isEditNote = true
     )
 
     UpdateNoteLocationView(

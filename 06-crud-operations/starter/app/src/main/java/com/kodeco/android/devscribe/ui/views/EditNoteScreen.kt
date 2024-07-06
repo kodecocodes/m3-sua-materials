@@ -1,136 +1,109 @@
-package com.kodeco.android.devscribe.ui.views
+package com.kodeco.android.devscribe.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.unit.sp
 import com.kodeco.android.devscribe.R
-import com.kodeco.android.devscribe.data.local.NoteEntity
-import com.kodeco.android.devscribe.ui.components.SpinnerView
-import com.kodeco.android.devscribe.ui.components.UpdateNoteLocationView
-import com.kodeco.android.devscribe.ui.state.CreateNoteState
-import com.kodeco.android.devscribe.ui.viewmodels.MainViewModel
-import org.koin.compose.koinInject
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditNoteScreen(
-    navigateToHome: () -> Unit,
-    note: NoteEntity?
+fun SpinnerView(
+    onPrioritySelected: (String) -> Unit,
+    previousSelectedItem: String  = "",
+    isEditNote: Boolean = false
 ) {
-    val viewModel: MainViewModel = koinInject()
-    LaunchedEffect(Unit) {
-        note?.let {
-            // Todo update state with previous note details
+    var expanded by remember { mutableStateOf(false) }
+    val priorities = listOf("High", "Medium", "Low")
+    var selectedIndex by remember {
+        mutableIntStateOf(0 )}
+
+
+    var selectedValueLabel by remember { mutableStateOf(priorities[selectedIndex]) }
+
+    LaunchedEffect(previousSelectedItem) {
+        if (isEditNote) {
+            selectedIndex = priorities.indexOf(previousSelectedItem)
+            selectedValueLabel = previousSelectedItem
+        } else {
+            selectedIndex = 0
+            expanded = false
+            selectedValueLabel = priorities[selectedIndex]
+            onPrioritySelected(selectedValueLabel)
         }
     }
-    val createNoteState by viewModel.createNoteState.collectAsStateWithLifecycle()
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.title_edit_note)
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                navigationIcon = {
-                    IconButton(
-                        onClick = navigateToHome,
-                        content = {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Back",
-                                tint = Color.White
-                            )
-                        }
+
+    Column {
+        Text(
+            text = "Select Priority"
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 6.dp)
+                .wrapContentSize(Alignment.TopStart)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = { expanded = true }),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = selectedValueLabel,
+                    fontSize = 16.sp,
+                    color = if (selectedIndex == 0) Color.Gray else Color.Black,
+                )
+
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = stringResource(id = R.string.cd_drop_down_icon)
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+            ) {
+                priorities.forEachIndexed { index, value ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(text = value, fontSize = 16.sp)
+                        },
+                        onClick = {
+                            selectedIndex = index
+                            expanded = false
+                            selectedValueLabel = value
+                            onPrioritySelected(value)
+                        },
                     )
                 }
-            )
-        },
-        content = {
-            Column(
-                modifier = Modifier
-                    .padding(it)
-            ) {
-                // Todo add update note screen content
             }
         }
-    )
-}
-
-@Composable
-fun UpdateNoteScreenContent(
-    createNoteState: CreateNoteState,
-    onTitleChange: (String) -> Unit,
-    onDescriptionChange: (String) -> Unit,
-    onPriorityChange: (String) -> Unit,
-    onUpdateNote: () -> Unit,
-    onNoteLocationChange: (String) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth(),
-            value = createNoteState.title ?: "",
-            onValueChange = onTitleChange,
-            label = { Text("Title") }
-        )
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth(),
-            value = createNoteState.description ?: "",
-            onValueChange = onDescriptionChange,
-            label = { Text("Description") }
-        )
-        SpinnerView(
-            onPrioritySelected = onPriorityChange
-        )
-
-        UpdateNoteLocationView(
-            onNoteLocationChange = onNoteLocationChange,
-            previousOption = createNoteState.noteLocation ?: ""
-        )
-
-        Button(
-            modifier = Modifier
-                .fillMaxWidth(),
-            onClick = onUpdateNote,
-            enabled = createNoteState.isValid(),
-            shape = RoundedCornerShape(10.dp),
-            content = {
-                Text("Update Note")
-            }
-        )
     }
 }

@@ -1,5 +1,6 @@
 package com.kodeco.android.devscribe.ui.views
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,12 +43,12 @@ fun EditNoteScreen(
     note: NoteEntity?
 ) {
     val viewModel: MainViewModel = koinInject()
+    val createNoteState by viewModel.createNoteState.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         note?.let {
             viewModel.updateNoteWithPreviousDetails(it)
         }
     }
-    val createNoteState by viewModel.createNoteState.collectAsStateWithLifecycle()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -133,7 +134,9 @@ fun UpdateNoteScreenContent(
             label = { Text("Description") }
         )
         SpinnerView(
-            onPrioritySelected = onPriorityChange
+            onPrioritySelected = onPriorityChange,
+            previousSelectedItem = createNoteState.priority ?: "",
+            isEditNote = true
         )
 
         UpdateNoteLocationView(

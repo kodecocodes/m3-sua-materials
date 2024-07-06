@@ -32,18 +32,28 @@ import com.kodeco.android.devscribe.R
 
 @Composable
 fun SpinnerView(
-  onPrioritySelected: (String) -> Unit
+  onPrioritySelected: (String) -> Unit,
+  previousSelectedItem: String  = "",
+  isEditNote: Boolean = false
 ) {
   var expanded by remember { mutableStateOf(false) }
-  var selectedIndex by remember { mutableIntStateOf(0) }
   val priorities = listOf("High", "Medium", "Low")
+  var selectedIndex by remember {
+    mutableIntStateOf(0 )}
+
+
   var selectedValueLabel by remember { mutableStateOf(priorities[selectedIndex]) }
 
-  LaunchedEffect(Unit) {
-    selectedIndex = 0
-    expanded = false
-    selectedValueLabel = priorities[selectedIndex]
-    onPrioritySelected(selectedValueLabel)
+  LaunchedEffect(previousSelectedItem) {
+    if (isEditNote) {
+        selectedIndex = priorities.indexOf(previousSelectedItem)
+        selectedValueLabel = previousSelectedItem
+    } else {
+      selectedIndex = 0
+      expanded = false
+      selectedValueLabel = priorities[selectedIndex]
+      onPrioritySelected(selectedValueLabel)
+    }
   }
 
   Column {
