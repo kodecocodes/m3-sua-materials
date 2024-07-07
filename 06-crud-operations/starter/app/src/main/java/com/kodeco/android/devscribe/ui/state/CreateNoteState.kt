@@ -18,5 +18,4 @@ sealed interface CreateNoteEvents {
 
   data class NoteLocationChanged(val noteLocation: String) : CreateNoteEvents
   data object CreateNote : CreateNoteEvents
-  data object UpdateNote : CreateNoteEvents
 }

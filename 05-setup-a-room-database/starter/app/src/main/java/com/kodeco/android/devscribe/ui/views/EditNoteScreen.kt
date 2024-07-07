@@ -43,7 +43,7 @@ fun EditNoteScreen(
     val viewModel: MainViewModel = koinInject()
     LaunchedEffect(Unit) {
         note?.let {
-            // Todo update state with previous note details
+            // TODO: update state with previous note details
         }
     }
     val createNoteState by viewModel.createNoteState.collectAsStateWithLifecycle()
@@ -78,7 +78,7 @@ fun EditNoteScreen(
                 modifier = Modifier
                     .padding(it)
             ) {
-                // Todo add update note screen content
+                // TODO: add update note screen content
             }
         }
     )

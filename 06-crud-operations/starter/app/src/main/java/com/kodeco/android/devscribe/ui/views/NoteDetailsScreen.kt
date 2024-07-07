@@ -97,8 +97,7 @@ fun NoteDetailsScreen(
             IconButton(
               onClick = {
                 note?.let {
-                  viewModel.delete(it)
-                  navigateBack()
+                  // TODO: Implement delete functionality
                 }
               },
               content = {
