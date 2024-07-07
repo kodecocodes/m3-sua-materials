@@ -46,7 +46,6 @@ fun DevScribeNavHost(
         }
       )
     }
-
     composable(Screens.EditNote.route+"/{note}") { backStackEntry ->
       EditNoteScreen(
         navigateToHome = {

@@ -34,9 +34,7 @@ val roomDatabaseModule = module {
     single { get<DevScribeDatabase>().notesDao() }
 }
 
-val dispatcherModule = module {
-    single { Dispatchers.IO }
-}
+val dispatcherModule = module { single { Dispatchers.IO } }
 
 val repositoryModule = module {
     single<NotesRepository> { NotesRepositoryImpl(get(), get()) }

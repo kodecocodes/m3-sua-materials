@@ -46,8 +46,8 @@ fun SpinnerView(
 
   LaunchedEffect(previousSelectedItem) {
     if (isEditNote) {
-        selectedIndex = priorities.indexOf(previousSelectedItem)
-        selectedValueLabel = previousSelectedItem
+      selectedIndex = priorities.indexOf(previousSelectedItem)
+      selectedValueLabel = previousSelectedItem
     } else {
       selectedIndex = 0
       expanded = false

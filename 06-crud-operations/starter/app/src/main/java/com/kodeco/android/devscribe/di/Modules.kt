@@ -5,7 +5,10 @@ import com.kodeco.android.devscribe.data.datastore.DataStoreManager
 import com.kodeco.android.devscribe.data.files.ExternalNotesFileManager
 import com.kodeco.android.devscribe.data.files.InternalNotesFileManager
 import com.kodeco.android.devscribe.data.local.DevScribeDatabase
+import com.kodeco.android.devscribe.repository.NotesRepository
+import com.kodeco.android.devscribe.repository.NotesRepositoryImpl
 import com.kodeco.android.devscribe.ui.viewmodels.MainViewModel
+import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -15,7 +18,7 @@ val dataStoreModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { MainViewModel(get(), get(), get()) }
+    viewModel { MainViewModel(get(), get(), get(), get()) }
 }
 
 val notesFileManagerModule = module {
@@ -31,10 +34,18 @@ val roomDatabaseModule = module {
     single { get<DevScribeDatabase>().notesDao() }
 }
 
+val dispatcherModule = module { single { Dispatchers.IO } }
+
+val repositoryModule = module {
+    single<NotesRepository> { NotesRepositoryImpl(get(), get()) }
+}
+
 
 val appModules = listOf(
     dataStoreModule,
     viewModelModule,
     notesFileManagerModule,
-    roomDatabaseModule
+    roomDatabaseModule,
+    repositoryModule,
+    dispatcherModule
 )
